@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+project_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+cd "${project_dir}"
+
 if [[ ! -f .env ]]; then
   echo "Missing .env. Copy .env.example to .env and fill in the values first." >&2
   exit 1
