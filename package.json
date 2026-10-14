@@ -1,0 +1,15 @@
+{
+  "name": "csci599-assignment-1-mcp-servers",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pinned MCP server dependencies for CSCI 599 Assignment 1",
+  "dependencies": {
+    "@modelcontextprotocol/server-filesystem": "1.0.0",
+    "tavily-mcp": "0.2.22"
+  },
+  "overrides": {
+    "tavily-mcp": {
+      "@modelcontextprotocol/sdk": "1.32.1"
+    }
+  }
+}
