@@ -19,6 +19,24 @@ turns within a `session_id` while the Cloud Run instance remains alive.
 - Pinned Python/npm dependencies, non-root multi-stage Docker image, tests, and deployment
   automation.
 
+## Additional MCP server: Open-Meteo weather
+
+Filesystem and Tavily are the two required servers (the assignment's recommended pairing).
+The third server, `mcp_servers/weather_server.py`, is a small MCP server I wrote on top of
+the public Open-Meteo APIs. Reasons for including it:
+
+- **No additional key or paid account.** Open-Meteo is free and needs no API key, so this
+  server can run during deployment and grading without another secret or provider account.
+- **Adds a different kind of tool.** Filesystem covers local files and Tavily covers web
+  search; weather returns structured real-time data. Together they support multi-step
+  queries such as "check the weather in LA and save a summary to a file".
+- **Exercises the server side of MCP.** It is built with FastMCP, which publishes the
+  `get_weather(location, forecast_days)` input JSON Schema through `tools/list`. Invalid
+  arguments or unknown locations come back as MCP tool errors that the agent can handle.
+
+The tool geocodes the location name with the Open-Meteo geocoding API, then fetches current
+conditions and a 1-7 day forecast.
+
 All commands below assume this directory is the current working directory. From the course
 repository root, enter it first:
 
@@ -163,6 +181,7 @@ flowchart LR
         SRC --> DOCKER
     end
 
+    SRC -->|python main.py / docker run<br/>same cloud LLM backend| NIM
     ENV -->|source .env; pass selected values<br/>with --set-env-vars| DEPLOY[deploy.sh / gcloud]
     DOCKER -->|gcloud builds submit| AR[Artifact Registry<br/>gcr.io-compatible image]
     DEPLOY --> AR

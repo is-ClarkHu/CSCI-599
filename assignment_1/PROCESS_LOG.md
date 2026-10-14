@@ -2,49 +2,64 @@
 
 ## 1. AI tools used
 
-- ChatGPT (model not recorded): interpreted the assignment PDF and compared framework and
-  LLM-provider choices.
-- OpenAI Codex (GPT-5): inspected the repository and assignment, implemented the service,
-  researched current official package documentation, wrote tests, and diagnosed dependency
-  and MCP integration issues.
+- ChatGPT (GPT-5.6 Sol, chat interface): helped me understand the assignment PDF and compare
+  framework and LLM provider options.
+- OpenAI Codex (GPT-5): main coding tool. Implemented the service, wrote the tests, and
+  helped debug dependency and MCP issues.
+- Claude Code (Claude Opus 5.5): checked the finished project against the rubric, ran live
+  multi-turn tests on the Cloud Run URL, and fixed two gaps in the README.
+- Gemini Pro: answered technical questions and concepts I didn't understand, including
+  parts of what the coding tools had done.
+- Kimi: tried it out briefly, did not use its output in the final project.
 
-## 2. Development narrative (200-300 words)
+## 2. Development narrative
 
-I started with an empty assignment branch containing only the repository README, so I first
-read the full assignment PDF and converted the rubric into a checklist. My initial question
-to ChatGPT was essentially, “What is this assignment doing, and is it just a chat service?”
-That clarified that the graded object is the backend agent loop, not a chat UI. I then asked
-Codex to “implement Assignment 1 on the current branch using NVIDIA NIM, real MCP calls,
-memory, and Cloud Run.” The first design used LangGraph, FastAPI, the official filesystem
-and Tavily servers, and a small student-authored Open-Meteo MCP server for the third-server
-criterion.
+I started by reading the PDF and asking ChatGPT, roughly, "What is this
+assignment actually asking for? Is it just a chat service?" That made it clear the graded
+part is the backend agent loop, not a UI. Hermes had come up in class, so at first I
+wondered if I should build on it. After rereading the rubric I dropped that idea. The
+assignment grades whether I can show memory, MCP discovery, tool calls and deployment
+myself, and Hermes would hide most of that behind a bigger platform.
 
-The first dependency installation failed because the newest Python `mcp` 2.x package was
-incompatible with `langchain-mcp-adapters`, which still required `mcp<2`. I checked the
-published dependency metadata and pinned the newest compatible 1.x release instead. npm
-then reported a high-severity OAuth advisory in Tavily's transitive MCP SDK. The application
-uses stdio rather than OAuth, but I still added a safe npm override to the patched SDK and
-confirmed that `npm audit` returned zero vulnerabilities. I also changed startup discovery
-to isolate servers: one unavailable MCP process no longer prevents healthy tools from
-loading. Finally, I added a non-root multi-stage image, input validation, a health endpoint,
-request timeouts, deployment and packaging scripts, and three diagrams that match the real
-implementation. The most useful AI output was the initial project skeleton; the most useful
-human decision was insisting on real protocol tests rather than accepting configuration as
-proof of integration.
+I picked LangGraph because it is the course-recommended stack and has a built-in
+checkpointer, and the rubric does not accept a hand-written dict for memory. For the model I
+talked it through with Codex and chose NVIDIA NIM: the developer key is free, Nemotron 3.5
+Lightning supports tool calling, and the endpoint is OpenAI-compatible, so ChatOpenAI works
+by changing the base URL. Filesystem and Tavily cover the two required servers. I added
+a small Open-Meteo weather server as the third because it is a different kind of tool and
+needs no API key.
+
+Then I asked Codex to "implement Assignment 1 on the current branch using NVIDIA NIM, real
+MCP calls, memory, and Cloud Run." It had the whole framework done in about 36 minutes,
+which I didn't believe at first. I kept asking it what it had done and how, file by file,
+before I trusted it. Testing and polishing took much longer than that.
+
+The main problem was dependencies. The newest Python mcp package was outside the version
+range langchain-mcp-adapters accepts, so I checked the dependency metadata and pinned mcp to
+a compatible 1.x release. After deploying, Claude Code's rubric check caught a missing local
+LLM in my deployment diagram and a missing rationale for the third server.
 
 ## 3. Verification narrative
 
-I ran 13 pytest tests, including actual `tools/list` calls against all three MCP servers and
-an actual filesystem `tools/call` write/read round trip. I separately invoked the weather and
-Tavily tools against their live APIs. I tested session isolation with LangGraph's real
-`InMemorySaver`, verified that `session_id` becomes the graph `thread_id`, and injected a
-missing executable, a transport exception, and a timeout to confirm graceful failure. I also
-ran `npm audit`, Python compilation, Docker build/start checks, and an HTTP health check. The
-full NIM-backed multi-turn smoke test is the final deployment check once a real key is loaded.
+- Ran the pytest suite (13 tests). It does real `tools/list` calls against all three MCP
+  servers and a real filesystem `tools/call` that writes a file and reads it back. It also
+  checks that `session_id` becomes the LangGraph `thread_id` and that two sessions don't
+  share memory.
+- Probed error handling on purpose: a missing server executable, a transport exception, a
+  timeout, and invalid tool arguments. The service returned an explanation instead of
+  crashing each time.
+- Ran `npm audit` and fixed a high-severity advisory in Tavily's MCP SDK with an npm
+  override.
+- On the live Cloud Run URL, `/health` shows all three servers connected with 20 tools
+  discovered.
+- Tested the live service by hand with curl and the `/docs` page. In one session I asked a
+  general knowledge question (answered with no tool), then asked for the LA weather saved to
+  a file (it called weather and then filesystem), then asked "What did I ask you first?" and
+  it answered correctly.
 
 ## 4. What I learned
 
-AI could generate a plausible stack quickly, but it could not assume that the newest package
-versions were compatible or that a configured MCP server had ever touched the wire. I had to
-verify the protocol boundary, memory semantics, subprocess environment, and deployment
-behavior with direct tests and inspect the failures before trusting the result.
+AI could build a plausible stack very fast, but it didn't know the newest package versions
+were incompatible with each other. I had to check the dependency metadata myself. A
+configured MCP server also isn't proof that anything touched the wire, so I only trusted the
+integration after testing tool calls directly and asking the AI to explain what it had built.
