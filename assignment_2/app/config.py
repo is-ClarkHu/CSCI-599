@@ -7,6 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+TAVILY_MCP_URL = "https://mcp.tavily.com/mcp/"
 
 
 class Settings(BaseSettings):
@@ -53,10 +54,15 @@ class Settings(BaseSettings):
 
     @property
     def tavily_mcp_url(self) -> str | None:
+        return None if self.tavily_api_key is None else TAVILY_MCP_URL
+
+    @property
+    def tavily_mcp_headers(self) -> dict[str, str]:
+        """Auth goes in a header, never the URL, so request logs cannot capture the key."""
+
         if self.tavily_api_key is None:
-            return None
-        key = self.tavily_api_key.get_secret_value()
-        return f"https://mcp.tavily.com/mcp/?tavilyApiKey={key}"
+            return {}
+        return {"Authorization": f"Bearer {self.tavily_api_key.get_secret_value()}"}
 
 
 def _resolve(path: Path) -> Path:

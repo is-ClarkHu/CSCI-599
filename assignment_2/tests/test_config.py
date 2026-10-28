@@ -11,9 +11,11 @@ def test_defaults_do_not_require_keys() -> None:
     assert settings.web_enabled is True
 
 
-def test_tavily_url_puts_key_in_query_string() -> None:
+def test_tavily_key_goes_in_header_not_url() -> None:
     settings = Settings(_env_file=None, tavily_api_key="tvly-abc")
-    assert settings.tavily_mcp_url == "https://mcp.tavily.com/mcp/?tavilyApiKey=tvly-abc"
+    assert settings.tavily_mcp_url == "https://mcp.tavily.com/mcp/"
+    assert "tvly-abc" not in settings.tavily_mcp_url
+    assert settings.tavily_mcp_headers == {"Authorization": "Bearer tvly-abc"}
 
 
 def test_tavily_url_is_none_without_key() -> None:
