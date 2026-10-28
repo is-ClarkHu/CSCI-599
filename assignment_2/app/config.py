@@ -54,15 +54,15 @@ class Settings(BaseSettings):
 
     @property
     def tavily_mcp_url(self) -> str | None:
-        return None if self.tavily_api_key is None else TAVILY_MCP_URL
+        """Remote MCP endpoint with the key as a query parameter, as the assignment specifies (PDF §3.4).
 
-    @property
-    def tavily_mcp_headers(self) -> dict[str, str]:
-        """Auth goes in a header, never the URL, so request logs cannot capture the key."""
+        The URL therefore contains a secret: main.py silences httpx request logging so it never reaches logs,
+        and TavilyTools never puts the URL into error messages.
+        """
 
         if self.tavily_api_key is None:
-            return {}
-        return {"Authorization": f"Bearer {self.tavily_api_key.get_secret_value()}"}
+            return None
+        return f"{TAVILY_MCP_URL}?tavilyApiKey={self.tavily_api_key.get_secret_value()}"
 
 
 def _resolve(path: Path) -> Path:

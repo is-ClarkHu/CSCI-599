@@ -88,8 +88,7 @@ class TavilyTools:
             self.status = TavilyStatus(error="TAVILY_API_KEY is not configured")
             return self.status
         try:
-            client = self.client_factory({"tavily": {"transport": "streamable_http", "url": url,
-                                                     "headers": self.settings.tavily_mcp_headers}},
+            client = self.client_factory({"tavily": {"transport": "streamable_http", "url": url}},
                                          tool_name_prefix=False)
             async with asyncio.timeout(self.settings.mcp_timeout_seconds):
                 tools = await client.get_tools()
@@ -98,7 +97,9 @@ class TavilyTools:
         except Exception as exc:
             # /health is public, so it only gets the exception type; the detail stays in server logs.
             self.status = TavilyStatus(error=type(exc).__name__)
-            logger.warning("Tavily MCP unavailable: %s: %s", type(exc).__name__, str(exc)[:200])
+            # The URL carries the key, so never log the exception text verbatim.
+            logger.warning("Tavily MCP unavailable: %s: %s", type(exc).__name__,
+                           str(exc)[:200].replace(url, "<tavily-mcp-url>"))
         return self.status
 
     async def search(self, query: str, agent: str, max_results: int = 5) -> list[dict]:

@@ -105,6 +105,19 @@ async def test_missing_key_means_unavailable(traces) -> None:
     assert status.connected is False and status.error == "TAVILY_API_KEY is not configured"
 
 
+async def test_connection_error_never_exposes_key(traces) -> None:
+    class LeakyClient:
+        def __init__(self, config, **kwargs):
+            self.url = config["tavily"]["url"]
+
+        async def get_tools(self):
+            raise ConnectionError(f"cannot reach {self.url}")
+
+    tavily = TavilyTools(Settings(_env_file=None, tavily_api_key="tvly-secret"), client_factory=LeakyClient)
+    status = await tavily.start()
+    assert status.error == "ConnectionError" and "tvly-secret" not in status.error
+
+
 async def test_tool_failure_returns_empty(traces) -> None:
     tavily = TavilyTools(Settings(_env_file=None, tavily_api_key="k"),
                          client_factory=lambda *a, **k: FakeClient([FakeTool("tavily_search", fail=True),
