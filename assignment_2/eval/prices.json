@@ -1,0 +1,10 @@
+{
+  "checked_on": "2026-10-27",
+  "note": "DeepSeek uses the peak-hour cache-miss rate (conservative upper bound); off-peak is half. Gemini rates apply through 2026-12-31.",
+  "per_million_tokens": {
+    "openai:gpt-6-sol": {"input": 2.00, "output": 10.00, "source": "https://developers.openai.com/api/docs/pricing"},
+    "gemini:gemini-3.8-flash": {"input": 0.75, "output": 3.75, "source": "https://ai.google.dev/gemini-api/docs/pricing"},
+    "deepseek:deepseek-flash": {"input": 0.30, "output": 1.20, "source": "https://api-docs.deepseek.com/quick_start/pricing/"},
+    "openai:text-embedding-3-small": {"input": 0.02, "output": 0.0, "source": "https://developers.openai.com/api/docs/pricing"}
+  }
+}

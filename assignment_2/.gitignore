@@ -1,0 +1,15 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+corpus/raw/
+data/medals.sqlite
+data/raw_tables/
+chroma_index/
+eval/results/*.tmp
+data/raw_wiki/
+
+# Instructor-provided reference files: kept locally and in the submission zip, not in the public repo
+docs/alternative_*.md
+docs/cost_analysis.md
+docs/frontend_vibecode_prompt.md

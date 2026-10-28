@@ -1,0 +1,7 @@
+{
+  "chunks_sha256": "eead6fe12c5573797f7121df2a843f8f9a2c80fb4501f812e6474627e570d98a",
+  "chunk_count": 1064,
+  "embedding_model": "text-embedding-3-small",
+  "collection": "ultimate_rules",
+  "built_on": "2026-10-27"
+}

@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.pyc
+.git/
+.pytest_cache/
+corpus/raw/
+data/raw_tables/
+data/medals.sqlite
+tests/
+eval/
+docs/
+*.zip
+data/raw_wiki/

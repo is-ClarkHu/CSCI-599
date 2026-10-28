@@ -1,0 +1,390 @@
+{
+  "url": "https://ultimate-assistant-nl5c2rxn7a-uw.a.run.app",
+  "summary": {
+    "warm_median_ttft_s": 4.694,
+    "warm_median_total_s": 4.87,
+    "median_cost_usd": 0.00417,
+    "cost_complete": true,
+    "prices_checked_on": "2026-10-27"
+  },
+  "runs": [
+    {
+      "client_ttft_s": 4.719,
+      "client_total_s": 4.894,
+      "server_ttft_ms": 4515,
+      "server_total_ms": 4735,
+      "retrieval_ms": 676,
+      "web_ms": 0,
+      "llm": {
+        "gemini:gemini-3.8-flash": {
+          "ms": 1534,
+          "input_tokens": 556,
+          "output_tokens": 28
+        },
+        "openai:gpt-6-sol": {
+          "ms": 2476,
+          "input_tokens": 1194,
+          "output_tokens": 199
+        }
+      },
+      "errors": [],
+      "category": "rules",
+      "query": "How long is the stall count under WFDF rules?",
+      "run": "first",
+      "cost_usd": 0.0049,
+      "cost_complete": true,
+      "cost_problems": []
+    },
+    {
+      "client_ttft_s": 4.694,
+      "client_total_s": 4.958,
+      "server_ttft_ms": 4608,
+      "server_total_ms": 4873,
+      "retrieval_ms": 237,
+      "web_ms": 0,
+      "llm": {
+        "gemini:gemini-3.8-flash": {
+          "ms": 1724,
+          "input_tokens": 556,
+          "output_tokens": 28
+        },
+        "openai:gpt-6-sol": {
+          "ms": 2865,
+          "input_tokens": 1194,
+          "output_tokens": 218
+        }
+      },
+      "errors": [],
+      "category": "rules",
+      "query": "How long is the stall count under WFDF rules?",
+      "run": "warm",
+      "cost_usd": 0.00509,
+      "cost_complete": true,
+      "cost_problems": []
+    },
+    {
+      "client_ttft_s": 3.704,
+      "client_total_s": 3.842,
+      "server_ttft_ms": 3635,
+      "server_total_ms": 3776,
+      "retrieval_ms": 516,
+      "web_ms": 0,
+      "llm": {
+        "gemini:gemini-3.8-flash": {
+          "ms": 1753,
+          "input_tokens": 552,
+          "output_tokens": 33
+        },
+        "openai:gpt-6-sol": {
+          "ms": 1469,
+          "input_tokens": 1081,
+          "output_tokens": 74
+        }
+      },
+      "errors": [],
+      "category": "rules",
+      "query": "What happens after a contested foul?",
+      "run": "first",
+      "cost_usd": 0.00344,
+      "cost_complete": true,
+      "cost_problems": []
+    },
+    {
+      "client_ttft_s": 3.629,
+      "client_total_s": 3.698,
+      "server_ttft_ms": 3573,
+      "server_total_ms": 3640,
+      "retrieval_ms": 260,
+      "web_ms": 0,
+      "llm": {
+        "gemini:gemini-3.8-flash": {
+          "ms": 1826,
+          "input_tokens": 552,
+          "output_tokens": 31
+        },
+        "openai:gpt-6-sol": {
+          "ms": 1505,
+          "input_tokens": 1081,
+          "output_tokens": 60
+        }
+      },
+      "errors": [],
+      "category": "rules",
+      "query": "What happens after a contested foul?",
+      "run": "warm",
+      "cost_usd": 0.003292,
+      "cost_complete": true,
+      "cost_problems": []
+    },
+    {
+      "client_ttft_s": 9.268,
+      "client_total_s": 9.816,
+      "server_ttft_ms": 9209,
+      "server_total_ms": 9753,
+      "retrieval_ms": 204,
+      "web_ms": 0,
+      "llm": {
+        "gemini:gemini-3.8-flash": {
+          "ms": 1826,
+          "input_tokens": 557,
+          "output_tokens": 36
+        },
+        "openai:gpt-6-sol": {
+          "ms": 4898,
+          "input_tokens": 934,
+          "output_tokens": 397
+        },
+        "deepseek:deepseek-flash": {
+          "ms": 2765,
+          "input_tokens": 823,
+          "output_tokens": 558
+        }
+      },
+      "errors": [],
+      "category": "summary",
+      "query": "Summarize how WFDF and USA Ultimate differ on fouls.",
+      "run": "first",
+      "cost_usd": 0.007308,
+      "cost_complete": true,
+      "cost_problems": []
+    },
+    {
+      "client_ttft_s": 11.953,
+      "client_total_s": 12.497,
+      "server_ttft_ms": 11887,
+      "server_total_ms": 12436,
+      "retrieval_ms": 217,
+      "web_ms": 0,
+      "llm": {
+        "gemini:gemini-3.8-flash": {
+          "ms": 2082,
+          "input_tokens": 557,
+          "output_tokens": 37
+        },
+        "openai:gpt-6-sol": {
+          "ms": 5291,
+          "input_tokens": 934,
+          "output_tokens": 454
+        },
+        "deepseek:deepseek-flash": {
+          "ms": 4803,
+          "input_tokens": 820,
+          "output_tokens": 1158
+        }
+      },
+      "errors": [],
+      "category": "summary",
+      "query": "Summarize how WFDF and USA Ultimate differ on fouls.",
+      "run": "warm",
+      "cost_usd": 0.0086,
+      "cost_complete": true,
+      "cost_problems": []
+    },
+    {
+      "client_ttft_s": 3.254,
+      "client_total_s": 3.329,
+      "server_ttft_ms": 3191,
+      "server_total_ms": 3275,
+      "retrieval_ms": 0,
+      "web_ms": 0,
+      "llm": {
+        "gemini:gemini-3.8-flash": {
+          "ms": 1705,
+          "input_tokens": 559,
+          "output_tokens": 29
+        },
+        "deepseek:deepseek-flash": {
+          "ms": 1527,
+          "input_tokens": 630,
+          "output_tokens": 102
+        }
+      },
+      "errors": [],
+      "category": "stats",
+      "query": "How many WUGC open division gold medals has the United States won?",
+      "run": "first",
+      "cost_usd": 0.000839,
+      "cost_complete": true,
+      "cost_problems": []
+    },
+    {
+      "client_ttft_s": 4.805,
+      "client_total_s": 4.87,
+      "server_ttft_ms": 4745,
+      "server_total_ms": 4807,
+      "retrieval_ms": 0,
+      "web_ms": 0,
+      "llm": {
+        "gemini:gemini-3.8-flash": {
+          "ms": 3104,
+          "input_tokens": 559,
+          "output_tokens": 30
+        },
+        "deepseek:deepseek-flash": {
+          "ms": 1646,
+          "input_tokens": 630,
+          "output_tokens": 154
+        }
+      },
+      "errors": [],
+      "category": "stats",
+      "query": "How many WUGC open division gold medals has the United States won?",
+      "run": "warm",
+      "cost_usd": 0.000906,
+      "cost_complete": true,
+      "cost_problems": []
+    },
+    {
+      "client_ttft_s": 3.863,
+      "client_total_s": 3.946,
+      "server_ttft_ms": 3711,
+      "server_total_ms": 3798,
+      "retrieval_ms": 0,
+      "web_ms": 0,
+      "llm": {
+        "gemini:gemini-3.8-flash": {
+          "ms": 1742,
+          "input_tokens": 561,
+          "output_tokens": 28
+        },
+        "deepseek:deepseek-flash": {
+          "ms": 2009,
+          "input_tokens": 638,
+          "output_tokens": 217
+        }
+      },
+      "errors": [],
+      "category": "stats",
+      "query": "Which country won the mixed division at the most recent WUGC in the database?",
+      "run": "first",
+      "cost_usd": 0.000978,
+      "cost_complete": true,
+      "cost_problems": []
+    },
+    {
+      "client_ttft_s": 3.39,
+      "client_total_s": 3.452,
+      "server_ttft_ms": 3315,
+      "server_total_ms": 3378,
+      "retrieval_ms": 0,
+      "web_ms": 0,
+      "llm": {
+        "gemini:gemini-3.8-flash": {
+          "ms": 1363,
+          "input_tokens": 561,
+          "output_tokens": 28
+        },
+        "deepseek:deepseek-flash": {
+          "ms": 1972,
+          "input_tokens": 638,
+          "output_tokens": 177
+        }
+      },
+      "errors": [],
+      "category": "stats",
+      "query": "Which country won the mixed division at the most recent WUGC in the database?",
+      "run": "warm",
+      "cost_usd": 0.00093,
+      "cost_complete": true,
+      "cost_problems": []
+    },
+    {
+      "client_ttft_s": 5.34,
+      "client_total_s": 5.69,
+      "server_ttft_ms": 5279,
+      "server_total_ms": 5631,
+      "retrieval_ms": 276,
+      "web_ms": 2042,
+      "llm": {
+        "gemini:gemini-3.8-flash": {
+          "ms": 1780,
+          "input_tokens": 555,
+          "output_tokens": 27
+        },
+        "openai:gpt-6-sol": {
+          "ms": 1492,
+          "input_tokens": 1953,
+          "output_tokens": 107
+        }
+      },
+      "errors": [],
+      "category": "news",
+      "query": "What is the latest WFDF news this month?",
+      "run": "first",
+      "cost_usd": 0.005494,
+      "cost_complete": true,
+      "cost_problems": []
+    },
+    {
+      "client_ttft_s": 5.603,
+      "client_total_s": 5.861,
+      "server_ttft_ms": 5508,
+      "server_total_ms": 5772,
+      "retrieval_ms": 291,
+      "web_ms": 1969,
+      "llm": {
+        "gemini:gemini-3.8-flash": {
+          "ms": 2138,
+          "input_tokens": 555,
+          "output_tokens": 28
+        },
+        "openai:gpt-6-sol": {
+          "ms": 1330,
+          "input_tokens": 1953,
+          "output_tokens": 76
+        }
+      },
+      "errors": [],
+      "category": "news",
+      "query": "What is the latest WFDF news this month?",
+      "run": "warm",
+      "cost_usd": 0.005187,
+      "cost_complete": true,
+      "cost_problems": []
+    },
+    {
+      "client_ttft_s": 2.103,
+      "client_total_s": 2.103,
+      "server_ttft_ms": 2042,
+      "server_total_ms": 2043,
+      "retrieval_ms": 0,
+      "web_ms": 0,
+      "llm": {
+        "gemini:gemini-3.8-flash": {
+          "ms": 2015,
+          "input_tokens": 552,
+          "output_tokens": 34
+        }
+      },
+      "errors": [],
+      "category": "off_topic",
+      "query": "Recommend a good laptop for programming.",
+      "run": "first",
+      "cost_usd": 0.000541,
+      "cost_complete": true,
+      "cost_problems": []
+    },
+    {
+      "client_ttft_s": 2.461,
+      "client_total_s": 2.461,
+      "server_ttft_ms": 2377,
+      "server_total_ms": 2377,
+      "retrieval_ms": 0,
+      "web_ms": 0,
+      "llm": {
+        "gemini:gemini-3.8-flash": {
+          "ms": 2348,
+          "input_tokens": 552,
+          "output_tokens": 25
+        }
+      },
+      "errors": [],
+      "category": "off_topic",
+      "query": "Recommend a good laptop for programming.",
+      "run": "warm",
+      "cost_usd": 0.000508,
+      "cost_complete": true,
+      "cost_problems": []
+    }
+  ]
+}
