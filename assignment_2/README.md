@@ -121,9 +121,9 @@ project needs billing enabled and an account with Cloud Run Admin, Cloud Build E
 ## Cost
 
 Measured 2026-10-27 on the live service (details and price sources in [docs/evaluation.md](docs/evaluation.md)):
-median **$0.0042 per in-domain query** (stats ≈ $0.0018, rules ≈ $0.004–0.006, news ≈ $0.006, summary ≈ $0.008;
-off-topic ≈ $0.0014). A full corpus re-embedding costs about $0.004. Cloud Run scales to zero when idle. Current
-numbers are inflated because the Gemini key was out of credit, so planning fell back to GPT-6 Sol.
+median **$0.0042 per in-domain query** (stats ≈ $0.0009, rules ≈ $0.003–0.005, news ≈ $0.005, summary ≈ $0.009;
+off-topic ≈ $0.0005). A full corpus re-embedding costs about $0.004. Cloud Run scales to zero when idle. Warm
+median TTFT is 4.7 s (target 3 s); the Gemini planning call (~1.8 s from us-west1) is the largest fixed cost.
 
 ## Off-topic policy
 
@@ -136,5 +136,5 @@ example question within about 2 s. Empty or over-2000-character queries are reje
 - Picture-only content (hand signals, field diagrams) is not extractable as text, so those questions are refused.
 - Retrieval sometimes prefers USA Ultimate or annotation chunks over the WFDF rule text (RAGAS context recall 0.48).
 - The medal database has the gaps listed above; WUCC results come only from the web.
-- During evaluation the Gemini key had no credit, so the Supervisor ran on its OpenAI fallback (visible in traces).
+- Warm TTFT (4.7 s median) is above the 3 s target; see `docs/evaluation.md` §2 for the breakdown and trade-offs.
 - Local development used Python 3.13 from Homebrew; the Docker image also uses 3.13.
