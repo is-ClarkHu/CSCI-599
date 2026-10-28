@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ultimate Assistant</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Ultimate Frisbee Assistant <span class="sub">multi-agent RAG</span></div>
+    <div class="health">
+      <span id="health-status" class="pill">checking…</span>
+      <details id="routing-details">
+        <summary>Routing table</summary>
+        <table id="routing-table">
+          <thead><tr><th>Agent</th><th>Provider</th><th>Model</th><th>Dimension</th><th>Reason</th><th>Fallback</th><th>Backup</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </details>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="chat">
+      <div id="examples" class="examples">
+        <button type="button" data-q="How many seconds does the marker count before a stall under WFDF rules?">Rules</button>
+        <button type="button" data-q="Summarize the main differences between WFDF and USA Ultimate rules on fouls.">Compare + summary</button>
+        <button type="button" data-q="How many gold medals has Japan won in the women's division at WUGC?">Medal stats</button>
+        <button type="button" data-q="Summarize the latest WFDF news this month in three bullet points.">Latest news</button>
+        <button type="button" data-q="What's a good recipe for banana bread?">Off-topic</button>
+      </div>
+      <div id="error-banner" class="error-banner" hidden></div>
+      <div id="messages" class="messages" aria-live="polite"></div>
+      <form id="chat-form" class="composer">
+        <textarea id="query" rows="2" maxlength="2000" placeholder="Ask about ultimate rules, world championship results or news…" required></textarea>
+        <div class="composer-actions">
+          <button id="send" type="submit">Send</button>
+          <button id="reset" type="button" class="secondary">Reset</button>
+        </div>
+      </form>
+      <div id="metrics" class="metrics"></div>
+    </section>
+
+    <aside class="side">
+      <section class="panel">
+        <h2>Trace</h2>
+        <ol id="trace-list" class="trace-list"></ol>
+      </section>
+      <section class="panel">
+        <h2>Citations</h2>
+        <ol id="citation-list" class="citation-list"></ol>
+      </section>
+    </aside>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
