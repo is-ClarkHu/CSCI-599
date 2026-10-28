@@ -25,3 +25,6 @@
 !**/workspace/.gitkeep
 **/tmp/
 /assignment_2/description/
+
+# Course materials (assignment descriptions, instructor handouts) stay out of this public repo
+**/*.pdf
