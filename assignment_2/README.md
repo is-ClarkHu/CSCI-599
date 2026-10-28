@@ -7,6 +7,8 @@ championship medal history, and current news.
 
 ![UI: routing card, trace panel and citations](docs/screenshots/summary_fallback.jpg)
 
+![One live session: stats, news summary, off-topic refusals, and an unrehearsed question answered via web search](docs/screenshots/session_overview.png)
+
 ## Architecture at a glance
 
 A LangGraph Supervisor (Gemini) classifies each question and makes a plan once. A pure-code `decide_next` then
@@ -18,6 +20,11 @@ dispatches to three specialist agents based on inspectable state:
   to Research for a web lookup.
 - **Summary** (DeepSeek): condenses the previous answer while keeping `[S#]` citations. It also calls the
   shared `tavily_extract` MCP tool.
+
+Every LLM call has a fallback provider (OpenAI for the Supervisor, Gemini for the workers), and **Moonshot Kimi
+(`kimi-k3`) is the last-resort backup for all agents**, used only if both the primary and the fallback fail. Each
+call is labelled in the trace and UI with its provider and tier (primary / FALLBACK / BACKUP), so a Kimi answer is
+always visible as such.
 
 FastAPI streams tokens, trace events and citations over SSE to a vanilla HTML/JS page that shows the routing
 card, the trace panel and clickable citations. See [docs/architecture.md](docs/architecture.md) for the graph,
@@ -48,7 +55,7 @@ Create the Gemini key with a **personal Gmail account**, not `@usc.edu` (Piazza 
 | OpenAI | Research, embeddings, RAGAS judge (fallback for Supervisor) | `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_EMBEDDING_MODEL` | `gpt-6-sol`, `text-embedding-3-small` |
 | DeepSeek | Summary, Data | `DEEPSEEK_API_KEY`, `DEEPSEEK_MODEL`, `DEEPSEEK_BASE_URL` | `deepseek-flash` @ `https://api.deepseek.com` |
 | Moonshot Kimi (China endpoint) | Last-resort backup for every agent | `KIMI_API_KEY`, `KIMI_MODEL`, `KIMI_BASE_URL` | `kimi-k3` @ `https://api.moonshot.cn/v1` |
-| Tavily Remote MCP | Research + Summary (shared tools) | `TAVILY_API_KEY` (sent as an `Authorization: Bearer` header) | `tavily_search`, `tavily_extract` |
+| Tavily Remote MCP | Research + Summary (shared tools) | `TAVILY_API_KEY` (passed as the `tavilyApiKey` query parameter, as PDF §3.4 specifies) | `tavily_search`, `tavily_extract` |
 
 Each agent has a fixed primary provider, one fallback, and Kimi as a shared last-resort backup used only when both fail (Piazza #161). Every LLM call emits an `llm_route` trace
 with provider, model, routing dimension (cost / capability / hybrid), reason and `fallback` flag; `/health`
@@ -96,8 +103,8 @@ python -m scripts.build_medals_db      # once
 ## Tests
 
 ```bash
-.venv/bin/pytest                       # ~125 unit tests, no network
-.venv/bin/pytest -m integration        # real OpenAI / Gemini / DeepSeek / Tavily calls
+.venv/bin/pytest                       # 131 unit tests, no network
+.venv/bin/pytest -m integration        # real OpenAI / Gemini / DeepSeek / Kimi / Tavily calls
 .venv/bin/python -m scripts.smoke_test http://localhost:8080   # 6 end-to-end cases against a running server
 ```
 

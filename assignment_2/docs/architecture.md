@@ -12,11 +12,18 @@ which specialist agents to run; three specialists do the work:
 | Data | Text-to-SQL over the medal database | Read-only SQLite (`run_sql`) | DeepSeek `deepseek-flash` |
 | Summary | Condense the previous agent's answer, preserving `[S#]` labels | Tavily `tavily_extract` (Remote MCP) | DeepSeek `deepseek-flash` |
 
+The Supervisor plans on Google Gemini `gemini-3.8-flash`. Every LLM call has a fallback provider, and Moonshot
+**Kimi `kimi-k3`** is a shared last-resort backup that answers only if both the primary and the fallback fail
+(see §6). Every call shows which provider handled it and why, so a Kimi answer is labelled as a backup in the trace
+and the UI.
+
 FastAPI streams every token, trace event and citation to a vanilla HTML/JS page over Server-Sent Events.
 
 ![Research → Summary turn with a visible Supervisor fallback](screenshots/summary_fallback.jpg)
 
 ![Data agent turn with the SQL citation](screenshots/stats_sql.jpg)
+
+![One session: medal stats, news summary, two off-topic refusals, and an unrehearsed in-domain question answered via web search](screenshots/session_overview.png)
 
 **Stateless single-turn design:** no conversation memory is claimed, so no Firestore/Cloud SQL is used
 (PDF §4.4). Every `POST /api/chat` request builds a fresh graph state; `session_id` is only logged for
@@ -66,6 +73,7 @@ flowchart LR
     SUP -- plan JSON --> GEM[(Google Gemini<br/>gemini-3.8-flash)]
     R -- answer --> OAI[(OpenAI<br/>gpt-6-sol)]
     S -- summary --> DS[(DeepSeek<br/>deepseek-flash)]
+    G -. last-resort backup when primary and fallback fail .-> KIMI[(Moonshot Kimi<br/>kimi-k3)]
     D -- SQL + answer --> DS
     R -- top-k=5 --> CH[(Chroma embedded<br/>chroma_index/)]
     CH -. query embedding .-> EMB[(OpenAI<br/>text-embedding-3-small)]
@@ -168,10 +176,10 @@ and the research draft is streamed by `finalize`.
 
 | Agent | Responsibility | Tools it can use | System prompt (summary) | Provider |
 |---|---|---|---|---|
-| Supervisor | classify + plan | none | category definitions, agent descriptions, 7 few-shot examples, JSON-only output | Gemini (fallback OpenAI) |
-| Research | grounded answer with citations | `ChunkStore.search`, `tavily_search`, `tavily_extract` | answer only from numbered sources, cite `[S#]`, say when sources do not cover it | OpenAI (fallback Gemini) |
-| Data | medal statistics | `run_sql` (read-only SQLite) | schema + series codes + year range; output one SELECT or `NO_SQL`; second prompt answers from the result only | DeepSeek (fallback Gemini) |
-| Summary | condense with citations | `tavily_extract` | ≤5 bullets, ≤150 words, keep every `[S#]` label, no new facts | DeepSeek (fallback Gemini) |
+| Supervisor | classify + plan | none | category definitions, agent descriptions, 7 few-shot examples, JSON-only output | Gemini (fallback OpenAI, backup Kimi) |
+| Research | grounded answer with citations | `ChunkStore.search`, `tavily_search`, `tavily_extract` | answer only from numbered sources, cite `[S#]`, say when sources do not cover it | OpenAI (fallback Gemini, backup Kimi) |
+| Data | medal statistics | `run_sql` (read-only SQLite) | schema + series codes + year range; output one SELECT or `NO_SQL`; second prompt answers from the result only | DeepSeek (fallback Gemini, backup Kimi) |
+| Summary | condense with citations | `tavily_extract` | ≤5 bullets, ≤150 words, keep every `[S#]` label, no new facts | DeepSeek (fallback Gemini, backup Kimi) |
 
 Research decides whether to use the web from inspectable state, recorded as `web_reason` in the
 `rag_retrieval` trace: `news` category, a prior `escalate`, or a top chunk score below
@@ -267,7 +275,7 @@ of first use. They are sent as `citation` events and the UI links each `[S#]` to
 
 ## 8. MCP tool sharing
 
-One Tavily Remote MCP connection (`app/mcp/tavily.py`, streamable HTTP, `https://mcp.tavily.com/mcp/` with the key in an `Authorization: Bearer` header, so request logs never contain it)
+One Tavily Remote MCP connection (`app/mcp/tavily.py`, streamable HTTP, `https://mcp.tavily.com/mcp/?tavilyApiKey=…` as PDF §3.4 specifies). Because the URL carries the key, `main.py` silences the httpx/httpcore request loggers (which log full URLs at INFO), and Tavily errors are reported by exception type only; the Cloud Run logs were checked to contain no key after deployment
 is discovered once at startup and shared by every agent. The rubric asks for the **same MCP tool invoked by
 different agents in different contexts**, and the shared tool here is **`tavily_extract`**:
 

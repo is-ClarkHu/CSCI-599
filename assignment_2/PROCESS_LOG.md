@@ -2,72 +2,51 @@
 
 ## AI tools used
 
-- **Claude Code (Claude Opus 5.5)** in the terminal: implemented the plan task by task, ran tests, ingested
-  the corpus, ran RAGAS, built the Docker image and deployed to Cloud Run.
-- **A separate planning session** produced `description/implementation_plan.md`: file layout, interfaces,
-  test-first steps for 20 tasks, and the grading-rubric mapping. I made the product decisions in it myself
-  (topic, three providers, Chroma, Tavily Remote MCP, stateless design, MCP sharing via `tavily_extract`).
-- The frontend (`static/`) was generated from the prompt in `docs/frontend_vibecode_prompt.md`, extended in
-  the plan (Task 16), then checked against the 10 UI requirements.
+ChatGPT (chat) for product discussion and plan review; Claude Code (Claude Opus 5.5) to write the 20-task plan,
+the code, tests and deployment; Codex for independent testing and git chores; Gemini to explain concepts I did
+not know. At runtime the assistant calls GPT-6 Sol, Gemini 3.8 Flash and DeepSeek Flash, with Moonshot Kimi K3
+as a last-resort backup.
 
 ## Development narrative
 
-I started from the Assignment 1 code style (pydantic-settings config, MCP error isolation, Dockerfile and
-deploy script) and wrote the plan first, so every rubric item had a task and a test. The corpus (14 WFDF and
-USA Ultimate PDFs) and the medal dataset (300 rows scraped from Wikipedia, cross-checked against each
-page's medal table) were prepared before coding. Implementation followed the plan's dependency order:
-config → LLM router with fallback → stream events → chunking and Chroma → RAG chain → SQLite and read-only
-SQL → shared Tavily MCP → three agents → supervisor planner and state-driven dispatch → LangGraph → FastAPI
-SSE → frontend → Docker and Cloud Run → RAGAS → latency and cost → docs. Most modules were written test-first
-against fakes, and real-provider integration tests came afterwards.
+I play for the USC ultimate team and in club ultimate; new players rarely know the rules, and the rules keep
+changing. I acted as product manager with ChatGPT, then had Claude write a full plan before any code. What
+worked: test-first tasks and fallbacks. Where I got stuck: Gemini ran out of credit mid-project (so I added Kimi
+as a backup), ragas was incompatible with langchain 1.x, and each Cloud Run redeploy took about ten minutes.
 
 ## Verification narrative
 
-- 120+ pytest unit tests cover routing and fallback, SSE framing, chunking, the Chroma store, SQL safety,
-  Tavily parsing and degradation, each agent, every `decide_next` rule, the graph end to end with fakes, the
-  API and the service.
-- Integration tests (`pytest -m integration`) call the real OpenAI, DeepSeek, Gemini and Tavily endpoints.
-- `scripts/smoke_test.py` runs six cases against a live server (rules, summary, stats, news, off-topic, and
-  `mcp_share`, which asserts that `tavily_extract` was called by both `research` and `summary`). All passed
-  locally before deployment, then again on Cloud Run.
-- I read real traces by hand (e.g. the WUCC 2026 question: Data → 0 rows → escalation → web → correct
-  answer) and checked that citations link to the right PDF pages.
+Beyond 131 unit tests and real-API integration tests, re-checked independently with Codex, a smoke test
+exercises six question types on the live service after every deploy. I clicked every example question, compared
+the answers with what I know as a player, read the traces, opened citations to check the PDF pages, and broke
+two API keys on purpose to watch the failover reach Kimi.
 
 ## What I learned
 
-- Library and provider details break plans: GPT-6 Sol rejects non-default `temperature` (it broke the RAGAS
-  judge until `bypass_temperature=True`), the pinned ragas version was incompatible with langchain 1.x, and a
-  Dockerfile that installs packages with `pip --user` needs `PYTHONUSERBASE` when later steps run as root.
-- Measure retrieval before tuning prompts. A small hit@5 script showed that USA Ultimate chunks crowded out
-  WFDF ones; prefixing the document title to each embedded chunk moved hit@5 from 15 to 19 out of 25. It also
-  shifted every score up, so the web-search threshold had to be recalibrated.
-- Fallback is not just a feature for the demo. The Gemini key ran out of credit mid-project and the system
-  kept working, with `fallback=true` visible in every trace.
+AI could not supply what only I had: knowing which rules matter to players, judging whether an answer was right,
+curating the medal table and writing the reference answers, and handling billing and keys. It also did not catch
+the Tavily key leaking into logs on its own; an automated security review did. Planning first, and measuring
+instead of assuming (Gemini was cheaper, not faster), worked far better than prompting ad hoc.
 
-## Prompt → code → verification loops
+## Appendix: prompt → code → verification loops
+
+Prompts are paraphrased; I did not keep the exact wording.
 
 ### Loop 1: frontend
 
-- **Prompt:** the Task 16 prompt (single-page vanilla HTML/CSS/JS; fetch + ReadableStream SSE parsing; routing
-  card from `agent_route`/`llm_route`; trace panel with coloured badges and expandable JSON; citation panel;
-  `[S#]` anchors; `textContent` only; responsive under 800px).
+- **Prompt:** build the Task 16 chat page: vanilla HTML/CSS/JS, SSE parsed with fetch + ReadableStream, a routing
+  card, a trace panel with coloured badges, a citation panel with clickable `[S#]` links, `textContent` only.
 - **Generated:** `static/index.html`, `static/app.js`, `static/style.css`.
-- **Verification:** `tests/test_static.py` (local assets only, all five event names and seven trace kinds
-  handled, no `innerHTML`, no frameworks) plus a manual browser pass on the five example buttons.
-- **Changed:** the off-topic case shows `off-topic, no worker` in the routing card as well as the trace, and
-  the fallback row is highlighted with a FALLBACK tag.
+- **Verification:** `tests/test_static.py`, the smoke test, and clicking through the deployed page.
+- **Changed:** the browser check found that the routing card dropped the Supervisor's FALLBACK row, because
+  rendering the later `agent_route` event cleared the card. The plan header is now prepended instead.
 
-### Loop 2: retrieval quality and the RAGAS run
+### Loop 2: retrieval quality
 
-- **Prompt:** "The live rules question returned 'sources do not cover this'; find out why, measure, fix."
-- **Generated:** a hit@5 script over `eval/questions.jsonl` (baseline 15/25), then `embedding_text()` in
-  `app/rag/store.py`, which embeds `title + text`, and a re-index from `chunks.jsonl`. hit@5 rose to 19/25.
-- **Verification:** re-ran hit@5 and the scores showed every top-1 score had risen, so I measured the top-1
-  distribution for in-domain and out-of-corpus queries and recalibrated `RELEVANCE_THRESHOLD` (0.35 → 0.50) and
-  a stricter `NEWS_CHUNK_THRESHOLD` (0.60). The first RAGAS run returned NaN everywhere: the judge had sent
-  `temperature=0.01` and GPT-6 Sol rejected it. Fixed with `bypass_temperature=True` and re-ran on the same
-  25 questions.
-- **Changed:** the stall-count question now answers "ten seconds" with a citation to WFDF p.14; RAGAS numbers
-  are in `docs/evaluation.md`.
-
-*Draft written by the coding agent; reviewed and edited by the student.*
+- **Prompt:** the stall-count question answered "the sources do not cover this"; find out why, measure it, and
+  fix it.
+- **Generated:** a hit@5 script over the 25 eval questions (baseline 15/25), then embeddings that include each
+  document's title (19/25).
+- **Verification:** because every similarity score rose, the web-search threshold was recalibrated (0.35 → 0.50).
+  The first RAGAS run returned NaN because GPT-6 Sol rejects custom temperature; it was fixed and re-run.
+- **Changed:** the stall-count question now answers "ten (10)" with a WFDF citation.
