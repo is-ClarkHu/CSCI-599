@@ -1,0 +1,10 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+corpus/raw/
+data/medals.sqlite
+data/raw_tables/
+chroma_index/
+eval/results/*.tmp
+data/raw_wiki/
