@@ -13,3 +13,4 @@ tests/
 eval/
 docs/
 *.zip
+data/raw_wiki/

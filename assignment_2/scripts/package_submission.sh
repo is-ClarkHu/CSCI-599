@@ -8,7 +8,7 @@ rm -f "${out}"
 
 zip -r "${out}" . \
   -x ".env" ".env.*" ".venv/*" "*/__pycache__/*" "*.pyc" ".pytest_cache/*" \
-     "corpus/raw/*" "data/raw_tables/*" "data/medals.sqlite" \
+     "corpus/raw/*" "data/raw_tables/*" "data/raw_wiki/*" "data/medals.sqlite" \
      "description/*" "*.DS_Store" "*.zip"
 zip "${out}" .env.example
 
